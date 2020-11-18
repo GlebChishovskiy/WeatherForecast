@@ -1,0 +1,43 @@
+.wrapper{
+    overflow: auto;
+}
+
+.color{
+    text-align: center;
+}
+
+.color h4{
+    width: 150px;
+    height: 120px;
+}
+
+.colors{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.paginator{
+    display: flex;
+    justify-content: center;
+}
+
+.button,.active{
+    background-color: transparent;
+    margin: 2px;
+    padding: 4px;
+    border: 2px solid black;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.button:hover{
+    background-color: black;
+    color: white;
+}
+
+.active{
+    background-color: black;
+    color: white;
+}
