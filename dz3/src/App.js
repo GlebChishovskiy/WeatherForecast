@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
+import Paginator from './Components/Paginator/Paginator'
+import Gallery from './Components/Select/Gallery'
 
 const NUMBER_EIGHT = 8
 
@@ -13,41 +15,38 @@ const App = () => {
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/albums/1/photos')
       .then(response => response.json()).then(data => {
-        let h = []
+        let cloneNumberPaginator = []
         for (let i = 1; i <= Math.ceil(data.length / NUMBER_EIGHT); i++) {
-          h[i] = i
+          cloneNumberPaginator[i] = i
         }
         getCountPortion(data)
-        return setData(data), setNumberPaginator(h)
+        return setData(data), setNumberPaginator(cloneNumberPaginator)
       })
   }, [])
 
   const getCountPortion = (data) => {
-      let d = []
-      for (let i = NUMBER_EIGHT * numberPortion; i < NUMBER_EIGHT + NUMBER_EIGHT * numberPortion; i++) {
-        d[i] = data[i]
-      }
-      let c = d.filter(n => n)
-      setPortion(c)
+    let clonePortion = []
+    for (let i = NUMBER_EIGHT * numberPortion; i < NUMBER_EIGHT + NUMBER_EIGHT * numberPortion; i++) {
+      clonePortion[i] = data[i]
+    }
+    let clonePortionFilter = clonePortion.filter(n => n)
+    setPortion(clonePortionFilter)
   }
 
   useEffect(() => {
-    if(data.length){
+    if (data.length) {
       getCountPortion(data)
     }
   }, [numberPortion])
 
   return (
     <div className='wrapper'>
-      <div className='paginator'>
-        {numberPaginator.map(index => <button className={index - 1 == numberPortion ? `active` : 'button'} key={index} onClick={() => setNumberPortion(index - 1)}>{index}</button>)}
-      </div>
-      <div className='colors'>
-        {portion.map(p => <div className='color' key={`${p.title}_${p.id}`}>
-          <h4>{p.title}</h4>
-          <div><img src={`${p.thumbnailUrl}`} /></div>
-        </div>)}
-      </div>
+      <Paginator
+        numberPaginator={numberPaginator}
+        numberPortion={numberPortion}
+        setNumberPortion={setNumberPortion} />
+      <Gallery
+        portion={portion} />
     </div>
   )
 }
