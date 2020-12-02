@@ -10,13 +10,16 @@ export class Circle extends React.Component {
     offset = 0
 
     componentDidMount() {
-        this.offset = document.getElementById('styledBrightStrip').getBoundingClientRect().x
+        const brightStrip = document.getElementById('brightStrip').getBoundingClientRect()
+
+        this.offset = brightStrip.x
         this.setState({
             transformX:
                 Math.round(
-                    document.getElementById('styledBrightStrip').getBoundingClientRect().right -
-                    document.getElementById('styledBrightStrip').getBoundingClientRect().x)
+                    brightStrip.right -
+                    brightStrip.x)
         })
+
     }
 
     mouseDownHandler = () => {
@@ -28,11 +31,12 @@ export class Circle extends React.Component {
     mouseMoveHandler = e => {
 
         const cursorX = e.clientX - this.offset
-        const stepLength = (this.props.widthRangeSlider - diameterCircle) / this.props.stepCount
+        const sliderRangeWithoutCircle = this.props.widthRangeSlider - diameterCircle
+        const stepLength = sliderRangeWithoutCircle / this.props.stepCount
         const stepNumber = Math.floor(cursorX / stepLength)
         let currentStepNumber
 
-        if (cursorX >= 0 && cursorX <= this.props.widthRangeSlider - diameterCircle) {
+        if (cursorX >= 0 && cursorX <= sliderRangeWithoutCircle) {
             if (cursorX - stepNumber * stepLength >= stepLength / 2) {
                 currentStepNumber = stepNumber + 1
             } else {
@@ -45,17 +49,15 @@ export class Circle extends React.Component {
         }
 
         let circleX = stepLength * currentStepNumber
-        let number = this.props.min + this.props.step * currentStepNumber
 
         this.setState({
             transformX: circleX
         })
 
-        this.props.setWidthBrightStripInPercent(circleX / ((this.props.widthRangeSlider - diameterCircle) / 100))
-        this.props.setWidthPaleStripInPercent(100 - this.props.widthBrightStripInPercent)
-        this.props.setNumbers(number)
+        this.props.setWidthBrightStripFragmentInPercent(circleX / (sliderRangeWithoutCircle / 100))
 
     }
+
 
     mouseUpHandler = () => {
         document.body.style.userSelect = 'auto'
@@ -89,5 +91,5 @@ export class Circle extends React.Component {
     }
 }
 
-export default Circle;
+export default Circle
 

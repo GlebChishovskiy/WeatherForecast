@@ -1,23 +1,18 @@
 import React from 'react'
-import styled from 'styled-components'
 import Strip from './Components/Strip/Strip'
 
 const App = () => {
+
   const widthRangeSlider = 500
-  const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  width: ${widthRangeSlider}px;
-  margin: auto;
-`;
+  const step = 2
+  const min = -200
+  const max = 150
 
   return (
-    <div>
-      <Wrapper>
-        <Strip widthRangeSlider={widthRangeSlider} />
-      </Wrapper>
-    </div>
+
+    <Strip step={step} min={min} max={max} widthRangeSlider={widthRangeSlider} />
+
   )
 }
 
-export default App;
+export default App
