@@ -17,11 +17,10 @@ const App = () => {
           <Switch>
             <Route exact path='/' component={Hello} />
             <Route path='/auth' >
-              
               <Auth setCurrentUser={setCurrentUser} currentUser={currentUser} />
             </Route>
             <Route path='/profile/:userId?'>
-              <Profile currentUser={currentUser} />
+              <Profile/>
             </Route>
           </Switch>
         </div>
@@ -30,4 +29,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default App

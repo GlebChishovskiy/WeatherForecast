@@ -6,6 +6,7 @@ const Auth = ({setCurrentUser,currentUser}) => {
     const emailRef = useRef()
     const passwordRef = useRef()
 
+    const [idCurrentUser, setIdCurrentUser] = useState()
     const [users, SetUsers] = useState(
         [
             {
@@ -38,14 +39,16 @@ const Auth = ({setCurrentUser,currentUser}) => {
     const loginChek = () => {
 
         let currentUser = users.filter(user => (user.email == emailRef.current.value &&
-            user.password == passwordRef.current.value))
+            user.password == passwordRef.current.value))[0]
 
         setCurrentUser(currentUser)
-
+        setIdCurrentUser(currentUser.id)
+        // console.log(idCurrentUser)
     }
 
+
     return (
-        <form>
+        <div>
             <div>
                 <input ref={emailRef} type='email' />
             </div>  
@@ -53,11 +56,13 @@ const Auth = ({setCurrentUser,currentUser}) => {
                 <input ref={passwordRef} type='password'></input>
             </div>
             <div>
-                <NavLink onClick={() => loginChek()} to={`/profile/1`}>
-                    <input type="submit" value="Отправить" />
+                <NavLink onClick={() => loginChek()} to={`/profile/${idCurrentUser}`}>
+                    <button>
+                        Отправить
+                    </button>
                 </NavLink>
             </div>
-        </form>
+        </div>
     )
 }
 

@@ -19,30 +19,32 @@ margin: auto;
 `
 
 const StyledBrightStrip = styled.span`
-width: ${props => props.widthBrightStripFragmentInPercent}%;
+width: ${props => props.widthBrightStrip}%;
 margin-top: ${marginTopStrit}px;
 height: 3px;
 background-color:#1400EE;
 `
 
 const StyledPaleStrip = styled.span`
-width: ${props => (100 - props.widthBrightStripFragmentInPercent)}%;
+width: ${props => 100 - props.widthBrightStrip}%;
 margin-top: ${marginTopStrit}px;
 height: 3px;
 background-color: #68ABEE;
 `
 
-const Strip = ({ widthRangeSlider, step, min, max }) => {
+const Slider = ({ widthRangeSlider, step, min, max, diameterCircle }) => {
 
-    const [widthBrightStripFragmentInPercent, setWidthBrightStripFragmentInPercent] = useState(0)
+    const [circleСoordinate, setCircleСoordinate] = useState(0)
+    const widthBrightStrip = (circleСoordinate / ((widthRangeSlider - diameterCircle) / 100))
 
     const stepCount = (max - min) / step
 
     return (
         <Wrapper widthRangeSlider={widthRangeSlider}>
             <Circle
-                widthBrightStripFragmentInPercent={widthBrightStripFragmentInPercent}
-                setWidthBrightStripFragmentInPercent={setWidthBrightStripFragmentInPercent}
+                diameterCircle={diameterCircle}
+                circleСoordinate={circleСoordinate}
+                setCircleСoordinate={setCircleСoordinate}
                 marginTopStrit={marginTopStrit}
                 widthRangeSlider={widthRangeSlider}
                 stepCount={stepCount}
@@ -52,15 +54,16 @@ const Strip = ({ widthRangeSlider, step, min, max }) => {
             >
                 <div>
                     <span style={StyleNumbers}>
-                        {Math.round((max - min) * (widthBrightStripFragmentInPercent / 100) + min)}
+                        {Math.round(
+                            (max - min) * (widthBrightStrip / 100) + min)}
                     </span>
                 </div>
             </Circle>
-            <StyledBrightStrip widthBrightStripFragmentInPercent={widthBrightStripFragmentInPercent} id='brightStrip'></StyledBrightStrip>
-            <StyledPaleStrip widthBrightStripFragmentInPercent={widthBrightStripFragmentInPercent}></StyledPaleStrip>
+            <StyledBrightStrip widthBrightStrip={widthBrightStrip} />
+            <StyledPaleStrip widthBrightStrip={widthBrightStrip} />
         </Wrapper>
     )
 }
 
-export default Strip;
+export default Slider
 

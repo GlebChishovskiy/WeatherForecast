@@ -1,14 +1,16 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 
-const Profile = ({currentUser}) => {
-
-console.log(currentUser)
+const Profile = (props) => {
+    debugger
+    console.log(props.match.params)
+    debugger
 
     return (
         <div>
-            {currentUser[0].name}
+            {/* {props.currentUser.name} */}
         </div>
     )
 }
 
-export default Profile
+export default withRouter(Profile)

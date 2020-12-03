@@ -1,25 +1,14 @@
 import React from 'react'
 
-const diameterCircle = 21
-
 export class Circle extends React.Component {
-    state = {
-        transformX: 0
-    }
 
     offset = 0
 
+    refOnBrightStrip = React.createRef()
+
     componentDidMount() {
-        const brightStrip = document.getElementById('brightStrip').getBoundingClientRect()
-
-        this.offset = brightStrip.x
-        this.setState({
-            transformX:
-                Math.round(
-                    brightStrip.right -
-                    brightStrip.x)
-        })
-
+        const brightStrip = this.refOnBrightStrip.current
+        this.offset = brightStrip.offsetLeft + brightStrip.clientWidth
     }
 
     mouseDownHandler = () => {
@@ -31,7 +20,7 @@ export class Circle extends React.Component {
     mouseMoveHandler = e => {
 
         const cursorX = e.clientX - this.offset
-        const sliderRangeWithoutCircle = this.props.widthRangeSlider - diameterCircle
+        const sliderRangeWithoutCircle = this.props.widthRangeSlider - this.props.diameterCircle
         const stepLength = sliderRangeWithoutCircle / this.props.stepCount
         const stepNumber = Math.floor(cursorX / stepLength)
         let currentStepNumber
@@ -50,11 +39,7 @@ export class Circle extends React.Component {
 
         let circleX = stepLength * currentStepNumber
 
-        this.setState({
-            transformX: circleX
-        })
-
-        this.props.setWidthBrightStripFragmentInPercent(circleX / (sliderRangeWithoutCircle / 100))
+        this.props.setCircleСoordinate(circleX)
 
     }
 
@@ -77,11 +62,12 @@ export class Circle extends React.Component {
                 this.props.children,
                 {
                     onMouseDown: this.mouseDownHandler,
+                    ref: this.refOnBrightStrip,
                     style: {
-                        transform: `translate(${this.state.transformX + diameterCircle / 2}px,
-                                ${this.props.marginTopStrit - diameterCircle / 2}px)`,
-                        width: `${diameterCircle}px`,
-                        height: `${diameterCircle}px`,
+                        transform: `translate(${this.props.circleСoordinate + this.props.diameterCircle / 2}px,
+                                ${this.props.marginTopStrit - this.props.diameterCircle / 2}px)`,
+                        width: `${this.props.diameterCircle}px`,
+                        height: `${this.props.diameterCircle}px`,
                         'border-radius': `50%`,
                         'background-color': `black`,
                     }

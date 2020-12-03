@@ -1,16 +1,15 @@
 import React from 'react'
-import Strip from './Components/Strip/Strip'
+import Slider from './Components/Slider/Slider'
+
+const STEP = 1
+const MIN = -200
+const MAX = 150
 
 const App = () => {
 
-  const widthRangeSlider = 500
-  const step = 2
-  const min = -200
-  const max = 150
-
   return (
 
-    <Strip step={step} min={min} max={max} widthRangeSlider={widthRangeSlider} />
+    <Slider step={STEP} min={MIN} max={MAX} diameterCircle={20} widthRangeSlider={500} />
 
   )
 }
