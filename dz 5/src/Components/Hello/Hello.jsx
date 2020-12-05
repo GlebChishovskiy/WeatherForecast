@@ -1,12 +1,13 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import style from './Hello.module.css'
 
 const Hello = () => {
 
     return (
-        <div>
+        <div className = {style.wrapper}>
             <h1>Hello</h1>
-            <NavLink to = '/auth'>Log in</NavLink>
+            <div><NavLink className ={style.log_in} to = '/auth'>Log in</NavLink></div>
         </div>
     )
 }

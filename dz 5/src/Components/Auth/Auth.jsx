@@ -1,67 +1,84 @@
 import React, { useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
+import style from './Auth.module.css'
 
-const Auth = ({setCurrentUser,currentUser}) => {
+const Auth = ({ setCurrentUser, users, setUsers }) => {
 
     const emailRef = useRef()
     const passwordRef = useRef()
+    const emailRefSignUp = useRef()
+    const passwordRefSignUp = useRef()
+    const nameSignUp = useRef()
 
-    const [idCurrentUser, setIdCurrentUser] = useState()
-    const [users, SetUsers] = useState(
-        [
-            {
-                email: 'a@gmail.com',
-                password: '1234',
-                id: 1,
-                name: 'Petr'
-            },
-            {
-                email: 'ab@gmail.com',
-                password: '4321',
-                id: 2,
-                name: 'Nikita'
-            },
-            {
-                email: 'abc@gmail.com',
-                password: 'abc',
-                id: 3,
-                name: 'Stepan'
-            },
-            {
-                email: 'df@gmail.com',
-                password: '28',
-                id: 4,
-                name: 'Filip'
-            }
-        ]
-    )
+    const [signInBoolean, setSignInBoolean] = useState(true)
 
-    const loginChek = () => {
+    const history = useHistory()
 
-        let currentUser = users.filter(user => (user.email == emailRef.current.value &&
-            user.password == passwordRef.current.value))[0]
+    const signIn = () => {
 
-        setCurrentUser(currentUser)
-        setIdCurrentUser(currentUser.id)
-        // console.log(idCurrentUser)
+        let currentUser = users.filter(user => (user.email === emailRef.current.value &&
+            user.password === passwordRef.current.value))[0]
+
+        setCurrentUser([currentUser])
+        if (currentUser) {
+            history.push(`/profile/${currentUser.id}`)
+        } else {
+            history.push(`/profile/error`)
+        }
+
     }
 
+    const signUp = () => {
+
+        const newUser = {
+            email: emailRefSignUp.current.value,
+            password: passwordRefSignUp.current.value,
+            id: users.length + 1,
+            name: nameSignUp.current.value
+        }
+
+        setUsers([...users, newUser])
+        history.push(`/profile/${users.length + 1}`)
+        setCurrentUser([newUser])
+    }
 
     return (
-        <div>
-            <div>
-                <input ref={emailRef} type='email' />
-            </div>  
-            <div>
-                <input ref={passwordRef} type='password'></input>
-            </div>
-            <div>
-                <NavLink onClick={() => loginChek()} to={`/profile/${idCurrentUser}`}>
-                    <button>
-                        Отправить
+        <div className={style.wrapper}>
+            <button className={style.button} onClick={() => setSignInBoolean(!signInBoolean)}>
+                {!signInBoolean ? 'sign IN' : 'sign UP'}
+            </button>
+            { signInBoolean ?
+                <div>
+                    <div>
+                        <label for='email'>Email</label>
+                        <input id='email' ref={emailRef} type='email' />
+                    </div>
+                    <div>
+                        <label for='password'>Password</label>
+                        <input id='password' ref={passwordRef} type='password'></input>
+                    </div>
+                    <button className={style.button} onClick={() => signIn()}>
+                        Войти
                     </button>
-                </NavLink>
-            </div>
+                </div> :
+                <div>
+                    <div>
+                        <label for='nameSignUp'>Name</label>
+                        <input id='nameSignUp' ref={nameSignUp} />
+                    </div>
+                    <div>
+                        <label for='emailSignUp'>Email</label>
+                        <input id='emailSignUp' ref={emailRefSignUp} type='email' />
+                    </div>
+                    <div>
+                        <label for='passwordSignUp'>Password</label>
+                        <input id='passwordSignUp' ref={passwordRefSignUp} type='password'></input>
+                    </div>
+                    <button className={style.button} onClick={() => signUp()}>
+                        Зарегистрироваться
+                    </button>
+                </div>
+            }
         </div>
     )
 }

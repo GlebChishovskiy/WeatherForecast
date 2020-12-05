@@ -70,6 +70,7 @@ export class Circle extends React.Component {
                         height: `${this.props.diameterCircle}px`,
                         'border-radius': `50%`,
                         'background-color': `black`,
+                        cursor: 'pointer'
                     }
                 }
             ))
