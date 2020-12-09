@@ -1,15 +1,15 @@
 import React from 'react'
 import Slider from './Components/Slider/Slider'
 
-const STEP = 1
-const MIN = -200
-const MAX = 150
+const STEP = 20
+const MIN = -120
+const MAX = 120
 
 const App = () => {
 
   return (
 
-    <Slider step={STEP} min={MIN} max={MAX} diameterCircle={20} widthRangeSlider={500} />
+    <Slider step={STEP} min={MIN} max={MAX} diameterCircle={30} widthRangeSlider={500} />
 
   )
 }

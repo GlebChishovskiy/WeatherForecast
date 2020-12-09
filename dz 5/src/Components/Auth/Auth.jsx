@@ -2,83 +2,67 @@ import React, { useRef, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import style from './Auth.module.css'
 
-const Auth = ({ setCurrentUser, users, setUsers }) => {
+const Auth = ({ users, setIsLoggedIn, setUsers }) => {
 
     const emailRef = useRef()
     const passwordRef = useRef()
-    const emailRefSignUp = useRef()
-    const passwordRefSignUp = useRef()
-    const nameSignUp = useRef()
+    const nameRef = useRef()
 
-    const [signInBoolean, setSignInBoolean] = useState(true)
+    const [isSignIn, setIsSignIn] = useState(true)
 
     const history = useHistory()
 
     const signIn = () => {
 
-        let currentUser = users.filter(user => (user.email === emailRef.current.value &&
-            user.password === passwordRef.current.value))[0]
-
-        setCurrentUser([currentUser])
+        let currentUser = users.find(user => (user.email === emailRef.current.value &&
+            user.password === passwordRef.current.value))
+        history.push(`/profile${currentUser ? `/${currentUser.id}` : ''}`)
         if (currentUser) {
-            history.push(`/profile/${currentUser.id}`)
-        } else {
-            history.push(`/profile/error`)
+            setIsLoggedIn(true)
         }
 
     }
 
     const signUp = () => {
 
-        const newUser = {
-            email: emailRefSignUp.current.value,
-            password: passwordRefSignUp.current.value,
-            id: users.length + 1,
-            name: nameSignUp.current.value
-        }
-
-        setUsers([...users, newUser])
+        setIsLoggedIn(true)
+        setUsers([...users, {
+            email: emailRef.current.value,
+            password: passwordRef.current.value,
+            name: nameRef.current.value,
+            id: users.length + 1
+        }])
         history.push(`/profile/${users.length + 1}`)
-        setCurrentUser([newUser])
+
     }
 
     return (
         <div className={style.wrapper}>
-            <button className={style.button} onClick={() => setSignInBoolean(!signInBoolean)}>
-                {!signInBoolean ? 'sign IN' : 'sign UP'}
+            <button className={style.button} onClick={() => setIsSignIn(!isSignIn)}>
+                {!isSignIn ? 'sign IN' : 'sign UP'}
             </button>
-            { signInBoolean ?
+            <div>
                 <div>
-                    <div>
-                        <label for='email'>Email</label>
-                        <input id='email' ref={emailRef} type='email' />
-                    </div>
-                    <div>
-                        <label for='password'>Password</label>
-                        <input id='password' ref={passwordRef} type='password'></input>
-                    </div>
-                    <button className={style.button} onClick={() => signIn()}>
-                        Войти
-                    </button>
-                </div> :
-                <div>
-                    <div>
-                        <label for='nameSignUp'>Name</label>
-                        <input id='nameSignUp' ref={nameSignUp} />
-                    </div>
-                    <div>
-                        <label for='emailSignUp'>Email</label>
-                        <input id='emailSignUp' ref={emailRefSignUp} type='email' />
-                    </div>
-                    <div>
-                        <label for='passwordSignUp'>Password</label>
-                        <input id='passwordSignUp' ref={passwordRefSignUp} type='password'></input>
-                    </div>
-                    <button className={style.button} onClick={() => signUp()}>
-                        Зарегистрироваться
-                    </button>
+                    <label for='email'>Email</label>
+                    <input id='email' ref={emailRef} type='email' />
                 </div>
-            }
+                <div>
+                    <label for='password'>Password</label>
+                    <input id='password' ref={passwordRef} type='password'></input>
+                </div>
+                {isSignIn ? <button className={style.button} onClick={signIn}>
+                    Войти
+                    </button> :
+                    <div>
+                        <div>
+                            <label for='name'>Name</label>
+                            <input id='name' ref={nameRef} />
+                        </div>
+                        <button className={style.button} onClick={signUp}>
+                            Зарегистрироваться
+                            </button>
+                    </div>}
+            </div>
         </div>
     )
 }

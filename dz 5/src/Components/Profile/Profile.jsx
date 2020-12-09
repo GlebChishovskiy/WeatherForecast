@@ -1,19 +1,23 @@
-import React from 'react'
-import { NavLink, useParams } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
+import ButtonSign from '../ButtonSign/Index'
 import style from './Profile.module.css'
 
-const Profile = ({ currentUser }) => {
+const Profile = ({ users, isLoggedIn }) => {
 
     const { userId } = useParams()
-    let user
-    if(userId !== 'error'){
-        user = currentUser.filter(p => p.id === +userId)[0]
-    }
+
+    let currentUser
+    useMemo(() => {
+        if (isLoggedIn) {
+            currentUser = users.find(u => u.id === +userId)
+        }
+    }, [users, userId])
 
     return (
-        <div className = {style.wrapper}>
-            {currentUser[0] !== undefined ? user.name : <h3> Доступа нету </h3>}
-            <NavLink to='/auth'><button>Sign out</button></NavLink>
+        <div className={style.wrapper}>
+            {currentUser !== undefined ? currentUser.name : 'Доступа нет'}
+            <ButtonSign >Log out</ButtonSign>
         </div>
     )
 }
