@@ -1,62 +1,47 @@
-import { useEffect, useRef } from "react"
-import axios from 'axios'
+import { Suspense, useEffect, useState, lazy } from 'react'
 import { observer } from "mobx-react"
-import { observable } from "mobx"
-import SimpleMap from './Components/Hello/Hello'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import styled from 'styled-components'
+import Weather from './Store/Index'
+import { Temp } from './Components/Temp/Temp'
 
-const Weather = observable({
+const AllSearchCity = lazy(() => import('./Components/AllSearchCity/AllSearchCity'))
+const Search = lazy(() => import('./Components/Search/Search'))
 
-  nameCity: "London",
-  temp: 0,
-  coord: {
-    lon:0,
-    lat:0
-  },
+const Wrapper = styled.div`
+overflow-y: hidden;
+display: grid;
+grid-template-columns: 1fr 1fr;
+padding: 10px;
+background-color:${props => props.colorPage};
+transition: background-color 1s;
+`
 
-  setCoord: function (newCoordLon, newCoordLat) {
-    return this.coord = {
-      lon:newCoordLon,
-      lat:newCoordLat
-    }
-  },
+export const App = observer(() => {
 
-  setTempInCity: function (newTemp) {
-    return this.temp = Math.round((newTemp - 273.15)*10)/10
-  },
-
-  setNameCity: function (newName) {
-    return this.nameCity = newName
-  }
-
-})
-
-const App = () => {
-
-  const refInput = useRef()
+  const [colorPage, setColorPage] = useState()
 
   useEffect(() => {
-    axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${Weather.nameCity}&appid=f746fe34b04088e9840201a09aa1d89b`).then(({ data }) => {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${Weather.nameCity}&appid=f746fe34b04088e9840201a09aa1d89b`).then(res => res.json()
+    ).then(data => {
       Weather.setTempInCity(data.main.temp)
-      Weather.setCoord(data.coord.lon,data.coord.lat)
-      console.log(Weather.coord)
-    })
+      Weather.setCoord(data.coord.lon, data.coord.lat)
+    }
+    )
   }, [Weather.nameCity])
 
-  const setCity = () => {
-    Weather.setNameCity(refInput.current.value)
-  }
-
   return (
-    <div>
-      <input ref={refInput} defaultValue='London' type="text" />
-      <button onClick={setCity}> Найти </button>
-      <div>
-        <span>{Weather.nameCity}:</span>
-        <span> {Weather.temp} °C</span>
-      </div>
-      <SimpleMap lon={Weather.coord.lon} lat={Weather.coord.lat}/>
-    </div>
+    <Wrapper colorPage={colorPage}>
+      <Router>
+        <Suspense fallback={<div>Загрузка...</div>}>
+          <Switch>
+            <Route exact path={`/search/:city?`} render={() => <Search />} />
+            <Route exact path={`/allFilms/:textInput?`} render={() => <AllSearchCity />} />
+          </Switch>
+          <Temp onChange={setColorPage} />
+        </Suspense>
+      </Router>
+    </Wrapper>
   )
-}
+})
 
-export default observer(App)
