@@ -3,12 +3,17 @@ import { makeAutoObservable, runInAction, autorun } from "mobx";
 const FETCH_STATE_IDLE = 0;
 const FETCH_STATE_FETCHING = 1;
 const FETCH_STATE_ERROR = 2;
+const ID_FOR_WEATHER = 'f746fe34b04088e9840201a09aa1d89b'
 
 class Weather {
 
     cities = []
-    searchСities = []
-    nameCity = "London"
+    description = ''
+    humidity = 0
+    speedWind = 0
+    degWind = 0
+    country = ''
+    nameCity = ''
     temp = 0
     fetchState = FETCH_STATE_IDLE
     onLine = navigator.onLine
@@ -19,11 +24,14 @@ class Weather {
     inputText = ''
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this, { cities: false })
 
         autorun(() => {
             if (this.onLine && this.fetchState === FETCH_STATE_IDLE) {
                 this.fetchCities()
+            }
+            if (this.nameCity !== undefined) {
+                this.fetchSelectedCity()
             }
         }, { delay: 500 })
 
@@ -40,23 +48,41 @@ class Weather {
         });
     }
 
-    get searchCitiesList() {
-        return this.cities.filter(p => p.name.toLowerCase().startsWith(this.inputText.toLowerCase())).slice(0, 10)
-        // let count = 0
-        // let array = []
-        // let length = this.cities.length
-        // for (let i = 0; i < length && count < 10; i++) {
-        //     if ( this.cities[i].name.toLowerCase().startsWith(this.inputText.toLowerCase())) {
-        //         count++
-        //         array[count++] = this.cities[i]
-        //     }
-        // }
+    get searchCitiesListLimit() {
+        let count = 0
+        let array = []
+        let length = this.cities.length
+        for (let i = 0; i < length; i++) {
+            if (this.cities[i].label.toLowerCase().startsWith(this.inputText.toLowerCase())) {
+                count++
+                array.push(this.cities[i])
+            }
+            if (count > 20) {
+                break
+            }
+        }
+        console.log(array,this.inputText);
+        return array
+    }
 
-        // return array
+    fetchSelectedCity() {
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.nameCity}&appid=${ID_FOR_WEATHER}`).then(res => res.json()
+        ).then(data => {
+            runInAction(() => {
+                this.setTempInCity(data.main.temp)
+                this.setHumidity(data.main.humidity)
+                this.setSpeedWind(data.wind.speed)
+                this.setDegWind(data.wind.deg)
+                this.setCountry(data.sys.country)
+                this.setDescription(data.weather[0].description)
+                this.setCoordLon(data.coord.lon)
+                this.setCoordLat(data.coord.lat)
+            })
+        }
+        )
     }
 
     fetchCities() {
-
         this.fetchState = FETCH_STATE_FETCHING
         fetch("http://localhost:3001/city")
             .then(res => res.json())
@@ -82,21 +108,34 @@ class Weather {
         this.inputText = text
     }
 
-    setCoord(newCoordLon, newCoordLat) {
-        return this.coord = {
-            lon: newCoordLon,
-            lat: newCoordLat
-        }
+    setCoordLon(newCoordLon) {
+        return this.coord.lon = newCoordLon
     }
-
+    setCoordLat(newCoordLat) {
+        return this.coord.lat = newCoordLat
+    }
     setTempInCity(newTemp) {
-        return this.temp = Math.round((newTemp - 273.15) * 10) / 10
+        return this.temp = newTemp
     }
-
+    setHumidity(newValue) {
+        return this.humidity = newValue
+    }
+    setSpeedWind(newValue) {
+        return this.speedWind = newValue
+    }
+    setDegWind(newValue) {
+        return this.degWind = newValue
+    }
+    setCountry(newCountry) {
+        return this.country = newCountry
+    }
+    setDescription(newValue) {
+        return this.description = newValue
+    }
     setNameCity(newName) {
-        return this.nameCity = newName//???
+        return this.nameCity = newName
     }
 
 }
 
-export default new Weather
+export default new Weather()

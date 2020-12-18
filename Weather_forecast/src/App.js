@@ -1,47 +1,46 @@
-import { Suspense, useEffect, useState, lazy } from 'react'
-import { observer } from "mobx-react"
+import { Suspense, useState, lazy } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
-import Weather from './Store/Index'
-import { Temp } from './Components/Temp/Temp'
+import a from './Img/1.png'
+import b from './Img/2.png'
+import c from './Img/3.png'
+import d from './Img/4.png'
+import e from './Img/5.png'
+import f from './Img/6.png'
+import g from './Img/7.png'
+import h from './Img/8.png'
+import i from './Img/9.png'
+import j from './Img/10.png'
+import k from './Img/11.png'
 
-const AllSearchCity = lazy(() => import('./Components/AllSearchCity/AllSearchCity'))
-const Search = lazy(() => import('./Components/Search/Search'))
+const SearchContainer = lazy(() => import('./Components/SearchContainer/SearchContainer'))
+const Main = lazy(() => import('./Components/Main/Index'))
 
 const Wrapper = styled.div`
+height:100vh;
 overflow-y: hidden;
-display: grid;
-grid-template-columns: 1fr 1fr;
-padding: 10px;
-background-color:${props => props.colorPage};
-transition: background-color 1s;
+transition: background-image 1.5s;
 `
 
-export const App = observer(() => {
+const images = [a, b, c, d, e, f, g, h, i, j, k]
 
-  const [colorPage, setColorPage] = useState()
+const App = () => {
 
-  useEffect(() => {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${Weather.nameCity}&appid=f746fe34b04088e9840201a09aa1d89b`).then(res => res.json()
-    ).then(data => {
-      Weather.setTempInCity(data.main.temp)
-      Weather.setCoord(data.coord.lon, data.coord.lat)
-    }
-    )
-  }, [Weather.nameCity])
+  const [imagePage, setImagePage] = useState()
 
   return (
-    <Wrapper colorPage={colorPage}>
+    <Wrapper style={{ 'background-image': `url(${images[imagePage]})` }} imagePage={imagePage}>
       <Router>
         <Suspense fallback={<div>Загрузка...</div>}>
           <Switch>
-            <Route exact path={`/search/:city?`} render={() => <Search />} />
-            <Route exact path={`/allFilms/:textInput?`} render={() => <AllSearchCity />} />
+            <Route exact path='/' component={Main} />
+            <Route path={`/search/:city?`} render={() => <SearchContainer onChange={setImagePage}/>} />
           </Switch>
-          <Temp onChange={setColorPage} />
         </Suspense>
       </Router>
     </Wrapper>
   )
-})
+}
+
+export default App
 
