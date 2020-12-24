@@ -1,4 +1,8 @@
-import { makeAutoObservable, runInAction, autorun } from "mobx";
+import { makeAutoObservable, computed, comparer, runInAction, autorun } from 'mobx'
+import { MIN, MAX } from '../Utils'
+
+const importAll = (r) => r.keys().map(r)
+const NUMBER_BACKGROUNDS = importAll(require.context('../Img', false, /\.(png)$/)).length
 
 const FETCH_STATE_IDLE = 0;
 const FETCH_STATE_FETCHING = 1;
@@ -7,33 +11,62 @@ const ID_FOR_WEATHER = 'f746fe34b04088e9840201a09aa1d89b'
 
 class Weather {
 
+    visiblePage = false
     cities = []
-    description = ''
-    humidity = 0
-    speedWind = 0
-    degWind = 0
-    country = ''
+    description = '----'
+    humidity = '----'
+    speedWind = '----'
+    degWind = '----'
+    country = '----'
     nameCity = ''
-    temp = 0
+    temp = 273
     fetchState = FETCH_STATE_IDLE
+    fetchCity = FETCH_STATE_IDLE
     onLine = navigator.onLine
     coord = {
         lon: 0,
         lat: 0
     }
     inputText = ''
+    value = 0
+    prevCity = ''
+    allCities = [
+        {
+            temp: 1,
+            name: 'a'
+        },
+        { temp: 2, name: 'b' },
+        { temp: 3, name: 'c' },
+        { temp: 4, name: 'd' },
+        { temp: 5, name: 'r' },
+        { temp: 2, name: 'aasd' },
+        { temp: 2, name: 'q2' },
+        { temp: 5, name: 'aasd' },
+        { temp: 10, name: 'dffg' },
+        { temp: 12, name: '456' },
+        { temp: 20, name: '345' },
+        { temp: 25, name: '43' },
+        { temp: -2, name: '232' },
+    ]
 
     constructor() {
-        makeAutoObservable(this, { cities: false })
+        makeAutoObservable(this, { searchCitiesList: computed({ equals: comparer.shallow }) })
 
         autorun(() => {
             if (this.onLine && this.fetchState === FETCH_STATE_IDLE) {
                 this.fetchCities()
             }
-            if (this.nameCity !== undefined) {
-                this.fetchSelectedCity()
+        }, { delay: 500 })
+
+        autorun(() => {
+            if (this.onLine && this.nameCity !== undefined && this.fetchCity === FETCH_STATE_IDLE) {
+                if (this.prevCity !== this.nameCity) {
+                    this.prevCity = this.nameCity
+                    this.fetchSelectedCity()
+                }
             }
         }, { delay: 500 })
+
 
         window.addEventListener("online", () => {
             runInAction(() => {
@@ -48,41 +81,74 @@ class Weather {
         });
     }
 
-    get searchCitiesListLimit() {
+    get searchCitiesList() {
         let count = 0
         let array = []
-        let length = this.cities.length
-        for (let i = 0; i < length; i++) {
-            if (this.cities[i].label.toLowerCase().startsWith(this.inputText.toLowerCase())) {
+
+        const inputTextLowerCase = this.inputText.toLowerCase()
+        for (let value of this.cities) {
+            if (value.label.toLowerCase().startsWith(inputTextLowerCase)) {
                 count++
-                array.push(this.cities[i])
-            }
-            if (count > 20) {
-                break
+                array.push(value)
+                if (count === 10) {
+                    break
+                }
             }
         }
-        console.log(array,this.inputText);
+
         return array
     }
 
+    get backgroundPage() {
+        const denominator = 100 / (NUMBER_BACKGROUNDS - 1)
+        return Math.round(((this.value - MIN) * 100 / (MAX - MIN)) / denominator)
+    }
+
+    get citiesCertainTemperature() {
+
+        let array = []
+        let count = 0
+        const valueTemp = this.value.toFixed(1)
+
+        for (let value of this.allCities) {
+            if (value.temp.toFixed(1) >= (valueTemp - 5) && value.temp.toFixed(1) <= (+valueTemp + 5)) {
+                count++
+                array.push(value)
+                if (count === 10) {
+                    break
+                }
+            }
+        }
+
+        return array
+
+    }
+
     fetchSelectedCity() {
-        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.nameCity}&appid=${ID_FOR_WEATHER}`).then(res => res.json()
-        ).then(data => {
-            runInAction(() => {
-                this.setTempInCity(data.main.temp)
-                this.setHumidity(data.main.humidity)
-                this.setSpeedWind(data.wind.speed)
-                this.setDegWind(data.wind.deg)
-                this.setCountry(data.sys.country)
-                this.setDescription(data.weather[0].description)
-                this.setCoordLon(data.coord.lon)
-                this.setCoordLat(data.coord.lat)
+        this.visiblePage = false
+        this.fetchCity = FETCH_STATE_FETCHING
+        if (this.nameCity) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.nameCity}&appid=${ID_FOR_WEATHER}`).then(res => res.json()
+            ).then(data => {
+                runInAction(() => {
+                    this.setWeaterInformation(data.coord.lon, data.coord.lat,
+                        data.main.temp, data.main.humidity, data.wind.speed,
+                        data.wind.deg, data.sys.country, data.weather[0].description,
+                    )
+                    this.fetchCity = FETCH_STATE_IDLE
+                    this.visiblePage = true
+                })
+            }
+            ).finally(() => {
+                runInAction(() => {
+                    this.fetchCity = FETCH_STATE_IDLE
+                })
             })
         }
-        )
     }
 
     fetchCities() {
+        this.visiblePage = false
         this.fetchState = FETCH_STATE_FETCHING
         fetch("http://localhost:3001/city")
             .then(res => res.json())
@@ -90,6 +156,8 @@ class Weather {
                 runInAction(() => {
                     this.cities = citiesList
                     this.fetchState = FETCH_STATE_IDLE
+                    this.visiblePage = true
+                    console.log(this.visiblePage);
                 });
             })
             .finally(() => {
@@ -100,40 +168,29 @@ class Weather {
 
     }
 
-    setSearchFilms(text) {
-        return this.searchСities = text
-    }
-
     changeInputText(text) {
         this.inputText = text
     }
 
-    setCoordLon(newCoordLon) {
-        return this.coord.lon = newCoordLon
+    setWeaterInformation(newLon, newLat,
+        newTemp, newHumidity,
+        newSpeedWind, newDegWind,
+        newCountry, newDescription) {
+        return this.coord.lon = newLon,
+            this.coord.lat = newLat,
+            this.temp = newTemp,
+            this.humidity = newHumidity,
+            this.speedWind = newSpeedWind,
+            this.degWind = newDegWind,
+            this.country = newCountry,
+            this.description = newDescription
     }
-    setCoordLat(newCoordLat) {
-        return this.coord.lat = newCoordLat
-    }
-    setTempInCity(newTemp) {
-        return this.temp = newTemp
-    }
-    setHumidity(newValue) {
-        return this.humidity = newValue
-    }
-    setSpeedWind(newValue) {
-        return this.speedWind = newValue
-    }
-    setDegWind(newValue) {
-        return this.degWind = newValue
-    }
-    setCountry(newCountry) {
-        return this.country = newCountry
-    }
-    setDescription(newValue) {
-        return this.description = newValue
-    }
+
     setNameCity(newName) {
         return this.nameCity = newName
+    }
+    setValue(value) {
+        return this.value = value
     }
 
 }
