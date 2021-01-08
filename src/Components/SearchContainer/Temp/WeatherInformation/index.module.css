@@ -1,0 +1,48 @@
+.wrapper {
+    border: 1px solid gray;
+    padding: 12px;
+}
+
+.temp_precipitation{
+    display: flex;
+}
+
+.location{
+    font-size: 30px;
+    margin-bottom:20px;
+}
+
+.inactive_button_temperature,.active_button_temperature{
+    padding: 7px 10px;
+    border-radius: 20px;
+    border: none;
+    background-color: #E9EFF7;
+    cursor: pointer;
+    font-size: 20px;
+    transition:color .3s,
+    background-color .3s;
+    margin-left: 10px;
+    font-weight: 700;
+}
+
+.inactive_button_temperature:hover,.active_button_temperature{
+    background-color: #84CD1B;
+    color: white;
+}
+
+.temp{
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+
+}
+
+.item{
+    padding: 10px 20px;
+    font-size: 20px;
+}
+
+.button_change_unit_temperature{
+    text-decoration: none;
+    color: black;
+}

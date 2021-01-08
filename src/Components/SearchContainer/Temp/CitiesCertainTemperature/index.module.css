@@ -1,0 +1,36 @@
+.search_cities_of_temperature {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 60px 60px;
+}
+
+.header_bottom{
+    text-align: center;
+    display: grid;
+    grid-template-rows: 60px 60px;
+}
+
+.wrapper {
+    border: 1px solid gray;
+    padding: 12px;
+}
+
+.item {
+    text-align: center;
+    font-weight: 700;
+    border-radius: 20px;
+    background-color: #E9EFF7;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.item_link{
+    text-decoration: none;
+    color:black;
+}
+
+.header{
+    text-align: center;
+    margin: 10px 0 20px;
+}
